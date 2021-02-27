@@ -1,8 +1,6 @@
 name: Build Status
 
-on:
-  push:
-    branches: [main]
+on: [push, pull_request]
 
 env:
   BUILD_TYPE: Release
