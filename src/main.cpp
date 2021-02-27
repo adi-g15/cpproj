@@ -30,11 +30,13 @@ int main(int argc, const char *argv[]) {
 
             return 0;
         } else if (result.count("build") > 0) {
-            build_code();
+            return build_code() ? EXIT_SUCCESS: EXIT_FAILURE;
         } else if (result.count("run") > 0) {
             execute_exec(result.count("exec") > 0
                              ? result["exec"].as<std::string>()
                              : "");
+
+            return 0;
         }
 
         for (const auto &arg : result.arguments()) {

@@ -37,7 +37,8 @@ int standard_str_to_num(const std::string &std_name) {
 }
 
 bool build_cmake_proj() {
-    if (exists("CMakeLists.txt")) {
+    bool in_project_root = exists("CMakeLists.txt");
+    if (in_project_root) {
         create_directory("build");
 
         std::filesystem::current_path("build"); // cd to build
@@ -46,6 +47,8 @@ bool build_cmake_proj() {
     if (exists("../CMakeLists.txt")) {
         std::system("cmake .. && cmake --build .");
 
+        if (in_project_root)
+            current_path(".."); // go back to project root
         return true;
     } else
         return false;
@@ -76,6 +79,7 @@ std::string get_exec_name(std::ifstream &cmakelists) {
     std::string content = util::read_file(cmakelists);
     auto iter = std::next(content.begin(), content.find("add_executable"));
 
+    std::advance(iter, std::size("add_executable"));
     iter = std::find_if(iter, content.end(),
                         [](char ch) { return !std::isspace(ch) && ch != '('; });
 
@@ -83,50 +87,59 @@ std::string get_exec_name(std::ifstream &cmakelists) {
         return "";
 
     return std::string(iter, std::find_if(iter, content.end(), [](char ch) {
-                           return std::isspace(ch);
+                           return std::isspace(ch) || ch == ')';
                        }));
 }
 
-void execute_exec(const std::string &executable_name = "") {
+void execute_exec(std::string executable_name = "") {
     if (!build_code())
         return;
 
     std::string executable_path;
     std::ifstream cmakelists;
 
-    if (fs::exists("CMakeLists.txt")) {
-        cmakelists.open("CMakeLists.txt");
+    bool is_project_root = fs::exists("CMakeLists.txt");
+    if (is_project_root) {
+        fs::current_path("build"); // cd to build/
+    } else if (!fs::exists("../CMakeLists.txt")) {
+        std::cerr << rang::fg::red
+                  << "[Error] `cpproj --run` can only be run inside the "
+                     "project directory or it's build directory !\n";
+        return;
+    }
 
-        if (cmakelists) {
-            get_exec_name(cmakelists);
-        } else if (!executable_name.empty()) {
-            executable_path = "build/" + executable_name;
-            if (!fs::exists(executable_path))
-                executable_path = "build/Debug/" + executable_path + ".exe";
+    cmakelists.open("../CMakeLists.txt");
 
-            std::system(executable_path.data());
+    if (cmakelists &&
+        executable_name
+            .empty()) { // when exec name is passed, it takes priority
+        executable_name = get_exec_name(cmakelists);
+    }
+
+    if (!executable_name.empty()) {
+        if (fs::exists(executable_name)) {
+#ifdef _WIN32
+            executable_path = ".\\" + executable_name + ".exe";
+#else
+            executable_path = "./" + executable_name;
+#endif
+        } else if (fs::exists("Debug")) {
+            executable_path = "Debug/" + executable_path + ".exe";
+        } else if (fs::exists("Release")) {
+            executable_path = "Release/" + executable_path + ".exe";
         }
-    } else if (fs::exists("CMakeCache.txt")) {
-        cmakelists.open("../CMakeLists.txt");
 
-        if (cmakelists) {
-            get_exec_name(cmakelists);
-        } else if (!executable_name.empty()) {
-            executable_path = executable_name;
-            if (!fs::exists(executable_path))
-                executable_path = "Debug/" + executable_path + ".exe";
-
-            std::system(executable_path.data());
-        }
+        std::system(executable_path.data());
     }
 
     if (executable_path.empty()) {
         std::cerr << rang::fg::red
                   << "[Error] Couldn't know the executable name\n"
-                  << rang::fg::reset
+                  << rang::fg::yellow
                   << "[Tip] It occurs since an add_executable was not found in "
                      "your root CMakeLists.txt file\n You may pass it manually "
-                     "using ---exec";
+                     "using ---exec\n"
+                  << rang::fg::reset;
 
         return;
     }

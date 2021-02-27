@@ -1,7 +1,7 @@
 #include <cxxopts.hpp>
 
-void set_options(cxxopts::Options& options) {
-        options.add_options()("name",
+void set_options(cxxopts::Options &options) {
+    options.add_options()("name",
                           "Name of project (can be passed directly too, "
                           "without mentioning --name)",
                           cxxopts::value<std::string>());
@@ -18,10 +18,10 @@ void set_options(cxxopts::Options& options) {
         cxxopts::value<std::string>()->default_value("cmake"));
     options.add_options()("B,build", "Build the project");
     options.add_options()("R,run", "Build and Run the executable");
-    options.add_options()(
-        "exec",
-        "Executable name (this is not required, and is used only by `cpproj run`)",
-        cxxopts::value<std::string>());
+    options.add_options()("exec",
+                          "Executable name (this is not required, and is used "
+                          "only by `cpproj run`)",
+                          cxxopts::value<std::string>());
     options.add_options()("h,help", "Show help");
 }
 
@@ -32,11 +32,12 @@ auto show_help(const cxxopts::Options &options) {
 
 auto debug_result(const cxxopts::ParseResult &result) {
     std::clog << "Arguments: ";
-    for(const auto& arg: result.arguments() ) {
+    for (const auto &arg : result.arguments()) {
         std::cout << arg.key() << " -> " << arg.value() << '\n';
     }
 
     std::clog << "Unmatched: \n";
-    std::copy(result.unmatched().begin(), result.unmatched().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+    std::copy(result.unmatched().begin(), result.unmatched().end(),
+              std::ostream_iterator<std::string>(std::cout, ", "));
     std::cout << std::endl;
 }
