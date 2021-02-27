@@ -1,4 +1,4 @@
-name: Build Status
+name: Windows Build
 
 on: [push, pull_request]
 
