@@ -7,9 +7,10 @@ on:
 env:
   BUILD_TYPE: Release
 
+# Ubuntu latest build fail, since it can't find <filesystem>, even though C++17 standard
 jobs:
-  build-ubuntu:
-    runs-on: ubuntu-latest
+  build-windows:
+    runs-on: windows-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2

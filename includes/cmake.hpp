@@ -58,6 +58,7 @@ bool generate_cmake_project(const std::string& project_name, int cxx_standard, b
                 MAIN_CPP_BOILERPLATE_( MAIN_CPP_BOILERPLATE );
 
     util::replace_all(CMAKELISTS_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
+    util::replace_all(CMAKELISTS_BOILERPLATE_, TAG_CXX_STANDARD, std::to_string(cxx_standard) );
     util::replace_all(MAIN_CPP_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
     util::replace_all(MAIN_CPP_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
 
