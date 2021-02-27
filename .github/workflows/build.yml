@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
+      with:
+        submodules: recursive
 
     - name: Create build directory
       run: cmake -E make_directory build

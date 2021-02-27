@@ -1,0 +1,28 @@
+#pragma once
+
+constexpr auto MAKEFILE_BOILERPLATE =
+"PROJECT    = my_project\n"
+"\n"
+"OPTIMIZE   = -Os\n"
+"DEFS       =\n"
+"LIBS       =\n"
+"\n"
+"CC         = g++\n"
+"\n"
+"CFLAGS_    = -g -Wall $(OPTIMIZE) $(DEFS) $(CFLAGS)\n"
+"LDFLAGS    =\n"
+"\n"
+"all: $(PROJECT)\n"
+"\n"
+"$(PROJECT): main.o\n"
+"	$(CC) $(CFLAGS_) $(LDFLAGS) -o $@ $^ $(LIBS)\n"
+"\n"
+"main.o: src/main.cpp\n"
+"	$(CC) src/main.cpp $(CFLAGS_) -o main.o -c\n"
+"\n"
+"#%.o: %.c\n"
+"#	$(CC) $(CFLAGS_) -o $@ -c $^\n"
+"\n"
+"clean:\n"
+"	rm $(PROJECT) *.o # *~\n"
+"\n";

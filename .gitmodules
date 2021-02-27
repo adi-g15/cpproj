@@ -1,3 +1,6 @@
 [submodule "ext/cxxopts"]
 	path = ext/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
+[submodule "ext/utilpp"]
+	path = ext/utilpp
+	url = https://github.com/adi-g15/utilpp

@@ -22,5 +22,10 @@ cmake ..
 cmake --build .
 ```
 
+## Future
+
+* Atleast some dependency handling (not management, the project's not targetting for that now, simple, you pass an argument, if Find* can find it add it then to CMakeLists)
+* msbuild starter boilerplate
+
 :copyright: Aditya Gupta 2021
 
