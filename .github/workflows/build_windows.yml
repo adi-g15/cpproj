@@ -28,9 +28,9 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Create sample repo
-      working-directory: ${{github.workspace}}/build/$BUILD_TYPE
-      run: .\cpproj $SAMPLE_PROJ
+      working-directory: ${{github.workspace}}/build/${{BUILD_TYPE}}
+      run: .\cpproj ${{SAMPLE_PROJ}}
 
     - name: Build and run sample repo
-      working-directory: ${{github.workspace}}/build/$BUILD_TYPE/$SAMPLE_PROJ
+      working-directory: ${{github.workspace}}/build/${{BUILD_TYPE}}/${{SAMPLE_PROJ}}
       run: ..\cpproj --run && cd build && ..\cpproj --run
