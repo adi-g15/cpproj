@@ -112,17 +112,3 @@ bool generate_cmake_project(const std::string &project_name, int cxx_standard,
 
     return true;
 }
-
-bool build_cmake_proj() {
-    if(exists("CMakeLists.txt")) {
-        create_directory("build");
-
-        std::filesystem::current_path("build"); //cd to build
-    }
-
-    if(exists("../CMakeLists.txt")) {
-        std::system("cmake .. && cmake --build .");
-
-        return true;
-    } else return false;
-}

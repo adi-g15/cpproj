@@ -3,9 +3,9 @@
 #include <string>
 #include <string_view>
 
-#include "options.hpp"
 #include "cmake.hpp"
 #include "make.hpp"
+#include "options.hpp"
 
 int main(int argc, const char *argv[]) {
     std::set<std::string> used_args;
@@ -19,7 +19,7 @@ int main(int argc, const char *argv[]) {
         "cpproj", "A C++ project management tool. Inspired from cargo.");
     // options.allow_unrecog(nised_options();
 
-    set_options(options);   // set supported operations
+    set_options(options); // set supported operations
 
     try {
         const auto &result = options.parse(argc, argv);
@@ -29,10 +29,12 @@ int main(int argc, const char *argv[]) {
             show_help(options);
 
             return 0;
-        } else if(result.count("build") > 0) {
+        } else if (result.count("build") > 0) {
             build_code();
-        } else if(result.count("run") > 0) {
-            execute_exec(result.count("exec") > 0 ? result["exec"].as<std::string>(): "");
+        } else if (result.count("run") > 0) {
+            execute_exec(result.count("exec") > 0
+                             ? result["exec"].as<std::string>()
+                             : "");
         }
 
         for (const auto &arg : result.arguments()) {
@@ -42,8 +44,11 @@ int main(int argc, const char *argv[]) {
         if (result.count("name") > 0)
             PROJECT_NAME = result["name"].as<std::string>();
 
-        if (PROJECT_NAME.empty() && result.count("build") == 0 && result.count("run") == 0) {
-            std::cout << rang::fg::yellow << "Wrong usage... See the available options: \n\n" << rang::fg::reset;
+        if (PROJECT_NAME.empty() && result.count("build") == 0 &&
+            result.count("run") == 0) {
+            std::cout << rang::fg::yellow
+                      << "Wrong usage... See the available options: \n\n"
+                      << rang::fg::reset;
 
             show_help(options);
 

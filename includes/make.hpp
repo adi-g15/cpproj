@@ -103,9 +103,10 @@ bool generate_make_project(const std::string &project_name, int cxx_standard,
 }
 
 bool build_make_proj() {
-    if(exists("Makefile")) {
+    if (exists("Makefile")) {
         std::system("make");
 
         return true;
-    } else return false;
+    } else
+        return false;
 }
