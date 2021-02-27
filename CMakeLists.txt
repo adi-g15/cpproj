@@ -18,6 +18,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 file(GLOB SOURCES src/*.cpp)
 include_directories(ext/cxxopts/include)
 include_directories(ext/utilpp/includes)
+include_directories(ext/rang/include)
 add_executable(cpproj ${SOURCES})
 
 target_include_directories(cpproj PRIVATE includes/)

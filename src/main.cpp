@@ -3,8 +3,7 @@
 #include <string>
 #include <string_view>
 
-#include <cxxopts.hpp>
-
+#include "options.hpp"
 #include "cmake.hpp"
 #include "make.hpp"
 
@@ -18,26 +17,9 @@ int main(int argc, const char *argv[]) {
 
     cxxopts::Options options(
         "cpproj", "A C++ project management tool. Inspired from cargo.");
-    // options.allow_unrecognised_options();
+    // options.allow_unrecog(nised_options();
 
-    options.add_options()("name",
-                          "Name of project (can be passed directly too, "
-                          "without mentioning --name)",
-                          cxxopts::value<std::string>());
-    options.add_options()(
-        "std", "C++ standard to use (11,14,17,20,..., default is c++17)",
-        cxxopts::value<std::string>()); // can be string or a simple number
-    options.add_options()("no-git",
-                          "DON'T initialise a repo, default is a git repo is "
-                          "also created in the project)",
-                          cxxopts::value<bool>());
-    options.add_options()(
-        "build_sys",
-        "make or cmake, build system or generator, default is cmake",
-        cxxopts::value<std::string>()->default_value("cmake"));
-    options.add_options()("B,build", "Build the project");
-    options.add_options()("R,run", "Build and Run the executable");
-    options.add_options()("h,help", "Show help");
+    set_options(options);   // set supported operations
 
     try {
         const auto &result = options.parse(argc, argv);
@@ -47,12 +29,10 @@ int main(int argc, const char *argv[]) {
             show_help(options);
 
             return 0;
-        } else if (unmatched_args.size() != 1 && result.count("name") != 1) {
-            std::cout << "Wrong usage... See the available options: \n\n";
-
-            show_help(options);
-
-            return EXIT_FAILURE;
+        } else if(result.count("build") > 0) {
+            build_code();
+        } else if(result.count("run") > 0) {
+            execute_exec(result.count("exec") > 0 ? result["exec"].as<std::string>(): "");
         }
 
         for (const auto &arg : result.arguments()) {
@@ -61,6 +41,14 @@ int main(int argc, const char *argv[]) {
 
         if (result.count("name") > 0)
             PROJECT_NAME = result["name"].as<std::string>();
+
+        if (PROJECT_NAME.empty() && result.count("build") == 0 && result.count("run") == 0) {
+            std::cout << rang::fg::yellow << "Wrong usage... See the available options: \n\n" << rang::fg::reset;
+
+            show_help(options);
+
+            return EXIT_FAILURE;
+        }
 
         for (const auto &arg : result.unmatched()) {
             if (used_args.find(arg) ==

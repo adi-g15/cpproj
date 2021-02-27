@@ -4,3 +4,6 @@
 [submodule "ext/utilpp"]
 	path = ext/utilpp
 	url = https://github.com/adi-g15/utilpp
+[submodule "ext/rang"]
+	path = ext/rang
+	url = https://github.com/adi-g15/rang

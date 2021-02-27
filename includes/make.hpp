@@ -101,3 +101,11 @@ bool generate_make_project(const std::string &project_name, int cxx_standard,
 
     return true;
 }
+
+bool build_make_proj() {
+    if(exists("Makefile")) {
+        std::system("make");
+
+        return true;
+    } else return false;
+}
