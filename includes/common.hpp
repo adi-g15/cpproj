@@ -58,7 +58,8 @@ bool build_cmake_proj() {
 bool build_code() {
     bool is_cmake_proj;
 
-    is_cmake_proj = fs::exists("CMakeLists.txt");
+    is_cmake_proj =
+        fs::exists("CMakeLists.txt") || fs::exists("../CMakeLists.txt");
 
     if (is_cmake_proj)
         return build_cmake_proj();
@@ -81,7 +82,7 @@ std::string get_exec_name(std::ifstream &cmakelists) {
 
     std::advance(iter, std::size("add_executable"));
     iter = std::find_if(iter, content.end(),
-                        [](char ch) { return !std::isspace(ch) && ch != '('; });
+                        [](char ch) { return ch != '(' && !std::isspace(ch); });
 
     if (iter == content.end())
         return "";
@@ -119,14 +120,14 @@ void execute_exec(std::string executable_name = "") {
     if (!executable_name.empty()) {
         if (fs::exists(executable_name)) {
 #ifdef _WIN32
-            executable_path = ".\\" + executable_name + ".exe";
+            executable_path = ".\\" + executable_name;
 #else
             executable_path = "./" + executable_name;
 #endif
         } else if (fs::exists("Debug")) {
-            executable_path = "Debug/" + executable_path + ".exe";
+            executable_path = "Debug\\" + executable_name;
         } else if (fs::exists("Release")) {
-            executable_path = "Release/" + executable_path + ".exe";
+            executable_path = "Release\\" + executable_name;
         }
 
         std::system(executable_path.data());

@@ -1,7 +1,8 @@
 CPProj
 ----
 
-[![Build Status](https://github.com/adi-g15/cpproj/actions/workflows/build.yml/badge.svg)](https://github.com/adi-g15/cpproj/actions/workflows/build.yml)
+[![Build Status](https://github.com/adi-g15/cpproj/actions/workflows/build_ubuntu.yml/badge.svg)](https://github.com/adi-g15/cpproj/actions/workflows/build_ubuntu.yml)
+[![Build Status](https://github.com/adi-g15/cpproj/actions/workflows/build_windows.yml/badge.svg)](https://github.com/adi-g15/cpproj/actions/workflows/build_windows.yml)
 
 A C++ project management tool. Inspired from cargo.
 
