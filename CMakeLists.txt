@@ -20,7 +20,7 @@ include_directories(ext/cxxopts/include)
 include_directories(ext/utilpp/includes)
 include_directories(ext/rang/include)
 add_executable(cpproj ${SOURCES})
-target_compile_options(cpproj PRIVATE --lstdc++fs)
+target_compile_options(cpproj PRIVATE -lstdc++fs)
 
 target_include_directories(cpproj PRIVATE includes/)
 target_include_directories(cpproj PRIVATE ./)
