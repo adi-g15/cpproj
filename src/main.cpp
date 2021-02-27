@@ -44,6 +44,15 @@ int main(int argc, const char *argv[]) {
         if (result.count("name") > 0)
             PROJECT_NAME = result["name"].as<std::string>();
 
+        for (const auto &arg : result.unmatched()) {
+            if (used_args.find(arg) ==
+                used_args
+                    .end()) { // first unmatched argument is considered the name
+                PROJECT_NAME = arg;
+                break;
+            }
+        }
+
         if (PROJECT_NAME.empty() && result.count("build") == 0 &&
             result.count("run") == 0) {
             std::cout << rang::fg::yellow
@@ -55,17 +64,6 @@ int main(int argc, const char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        for (const auto &arg : result.unmatched()) {
-            if (used_args.find(arg) ==
-                used_args
-                    .end()) { // first unmatched argument is considered the name
-                PROJECT_NAME = arg;
-                break;
-            }
-        }
-
-        if (PROJECT_NAME.empty())
-            throw std::logic_error("PROJECT_NAME was empty");
         PROJECT_CXX_STANDARD =
             result.count("std") > 0
                 ? standard_str_to_num(result["std"].as<std::string>())

@@ -1,5 +1,6 @@
 build
 .vscode
+cpproj
 
 CMakeLists.txt.user
 CMakeCache.txt
