@@ -1,0 +1,20 @@
+# This file structure is to be supported, not all keys need to be considered at first, keep it simple, the dependencies section just puts submodules in an ext/ directory, it is still very helpful, since it should allow this: you just add the dependency name, and whenever sync or build is executed, add  the url and ref section of the section by itself, this will likely work with help of a config file containing a mapping to these functions
+
+project:
+  name: CPProj
+  author: Aditya Gupta <ag15035@gmail.com>
+  description: A C++ project management tools
+  repo_url: https://github.com/adi-g15/cpproj.git
+  license: Unlicense
+  
+dependencies:
+  utilpp:
+    url: https://github.com/adi-g15/utilpp.git
+    ref: a6f49b28f50d4d2f614291e210fc157c58e1192b
+  rang:
+    url: https://github.com/adi-g15/rang.git
+    ref: 16d6b0dde1bce741d072150115dfe0bbd6dab0fa
+  cxxopts:
+    utl: https://github.com/jarro2783/cxxopts.git
+    ref: dd45a0801c99d62109aaa29f8c410ba8def2fbf2
+
