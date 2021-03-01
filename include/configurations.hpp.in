@@ -1,0 +1,3 @@
+#pragma once
+
+#cmakedefine GLOBAL_CONFIG_LOCATION "@GLOBAL_CONFIG_LOCATION@"

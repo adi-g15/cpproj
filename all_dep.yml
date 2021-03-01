@@ -1,0 +1,8 @@
+utilpp: "https://github.com/adi-g15/utilpp"
+graphMat: "https://github.com/adi-g15/graphMat"
+rang: "https://github.com/.../rang"
+cxxopts: "https://github.com/jarro2783/cxxopts.git"
+nanogui: "https://github.com/mitsuba-renderer/nanogui.git"
+spdlog: "https://github.com/gabime/spdlog.git"
+yaml-cpp: "https://github.com/jbeder/yaml-cpp"
+mini-yaml: "https://github.com/jimmiebergmann/mini-yaml"

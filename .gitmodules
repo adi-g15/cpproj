@@ -7,3 +7,6 @@
 [submodule "ext/rang"]
 	path = ext/rang
 	url = https://github.com/adi-g15/rang
+[submodule "ext/mini-yaml"]
+	path = ext/mini-yaml
+	url = https://github.com/jimmiebergmann/mini-yaml

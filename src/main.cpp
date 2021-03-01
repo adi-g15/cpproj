@@ -4,8 +4,13 @@
 #include <string_view>
 
 #include "cmake.hpp"
+#include "configurations.hpp"
 #include "make.hpp"
 #include "options.hpp"
+
+#include "git_connect.hpp"
+
+#include <rang.hpp>
 
 int main(int argc, const char *argv[]) {
     std::set<std::string> used_args;
@@ -17,7 +22,6 @@ int main(int argc, const char *argv[]) {
 
     cxxopts::Options options(
         "cpproj", "A C++ project management tool. Inspired from cargo.");
-    // options.allow_unrecog(nised_options();
 
     set_options(options); // set supported operations
 
@@ -30,7 +34,7 @@ int main(int argc, const char *argv[]) {
 
             return 0;
         } else if (result.count("build") > 0) {
-            return build_code() ? EXIT_SUCCESS: EXIT_FAILURE;
+            return build_code() ? EXIT_SUCCESS : EXIT_FAILURE;
         } else if (result.count("run") > 0) {
             execute_exec(result.count("exec") > 0
                              ? result["exec"].as<std::string>()
@@ -91,10 +95,8 @@ int main(int argc, const char *argv[]) {
         }
 
         if (PROJECT_BUILD_MNGR == "cmake") {
-            std::cout << "Generating a CMake Project...\n";
-
-            generate_cmake_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
-                                   PROJECT_USE_GIT);
+            cmake::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
+                                    PROJECT_USE_GIT);
 
         } else if (PROJECT_BUILD_MNGR == "make") {
             std::cout << "Generating a Make Project...\n";
@@ -105,10 +107,9 @@ int main(int argc, const char *argv[]) {
         } else {
             std::cout << "[Warning] " << PROJECT_BUILD_MNGR
                       << " not supported\n";
-            std::cout << "Generating a CMake Project...\n";
 
-            generate_cmake_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
-                                   PROJECT_USE_GIT);
+            cmake::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
+                                    PROJECT_USE_GIT);
         }
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <filesystem>
 #include <string>
 
@@ -12,10 +13,12 @@
 
 #include "gitignore/C++.boilerplate.hpp"
 
+#include <util/string.hpp>
+
 using namespace std::filesystem;
 
 // wanted to use std::32string, but writing the widen is not so simple
-bool generate_make_project(const std::string &project_name, int cxx_standard,
+inline bool generate_make_project(const std::string &project_name, int cxx_standard,
                            bool use_git) {
     char ch;
     std::clog << "Working Directory: " << current_path() << '\n';
@@ -102,7 +105,7 @@ bool generate_make_project(const std::string &project_name, int cxx_standard,
     return true;
 }
 
-bool build_make_proj() {
+inline bool build_make_proj() {
     if (exists("Makefile")) {
         std::system("make");
 

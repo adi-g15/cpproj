@@ -1,7 +1,4 @@
-#pragma once
-
-static constexpr auto TAG_PROJECT_NAME = "${{CPPROJ_PROJECT_NAME}}";
-static constexpr auto TAG_CXX_STANDARD = "${{CPPROJ_CXX_STANDARD}}";
+#include "common.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -12,9 +9,60 @@ static constexpr auto TAG_CXX_STANDARD = "${{CPPROJ_CXX_STANDARD}}";
 #include <util/file.hpp>
 #include <util/string.hpp>
 
+#include "boilerplate/main.boilerplate.hpp"
 #include "make.hpp"
 
 namespace fs = std::filesystem;
+
+// returns FALSE if USER DENIED ANY FURTHER ACTION
+bool common::check_project_existence(const std::string &project_name) {
+    char ch;
+    std::clog << "Working Directory: " << current_path() << '\n';
+    if (exists(project_name)) {
+        std::cout << "\n\n"
+                  << project_name << "/ already exists! Chose one option: \n"
+                  << "[Y|y] Delete original folder\n"
+                  << "[N|n] Don't change anything\n"
+                  << "[O|o] Overwrite conflicting files\n Enter your choice : ";
+
+        std::cin >> ch;
+
+        switch (ch) {
+        case 'Y':
+        case 'y':
+            std::clog << "Removed " << project_name << "/\n";
+            remove_all(project_name);
+        case 'O':
+        case 'o':
+            break; // continue with the function
+        case 'N':
+        case 'n':
+        default:
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// writes contents of main.cpp
+bool common::write_main(const std::string &project_name,
+                        const std::string &_author) {
+    std::ofstream main_cpp("src/main.cpp");
+
+    if (main_cpp)
+        return false;
+
+    std::string MAIN_CPP_BOILERPLATE_(MAIN_CPP_BOILERPLATE);
+
+    util::replace_all(MAIN_CPP_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
+    util::replace_all(MAIN_CPP_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
+
+    main_cpp << MAIN_CPP_BOILERPLATE_;
+
+    main_cpp.close();
+    return true;
+}
 
 /**
  * @brief - Converts standard name in string to a number
@@ -36,7 +84,7 @@ int standard_str_to_num(const std::string &std_name) {
     return std::stoi(standard_str.data());
 }
 
-bool build_cmake_proj() {
+inline bool build_cmake_proj() {
     bool in_project_root = exists("CMakeLists.txt");
     if (in_project_root) {
         create_directory("build");
@@ -91,7 +139,7 @@ std::string get_exec_name(std::ifstream &cmakelists) {
                        }));
 }
 
-void execute_exec(std::string executable_name = "") {
+void execute_exec(std::string executable_name) {
     if (!build_code())
         return;
 
@@ -137,8 +185,8 @@ void execute_exec(std::string executable_name = "") {
                   << "[Error] Couldn't know the executable name\n"
                   << rang::fg::yellow
                   << "[Tip] It occurs since an add_executable was not found in "
-                     "your root CMakeLists.txt file\n You may pass it manually "
-                     "using ---exec\n"
+                     "your root CMakeLists.txt, or Build failed\n You may pass "
+                     "it manually using ---exec\n"
                   << rang::fg::reset;
 
         return;
