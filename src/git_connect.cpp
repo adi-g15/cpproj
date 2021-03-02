@@ -6,9 +6,11 @@
 #include <filesystem>
 #include <iostream>
 
-bool git_connect::init_git_repo() {}
+void git_connect::init_git_repo() {
+    std::system("git init");    // could use pstream's exec_command, but that can't change directories
+}
 
-bool git_connect::init_git_repo(const std::filesystem::path &path) {
+void git_connect::init_git_repo(const std::filesystem::path &path) {
     using std::filesystem::current_path;
 
     auto original_path = current_path();

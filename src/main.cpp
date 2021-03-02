@@ -8,8 +8,6 @@
 #include "make.hpp"
 #include "options.hpp"
 
-#include "git_connect.hpp"
-
 #include <rang.hpp>
 
 int main(int argc, const char *argv[]) {

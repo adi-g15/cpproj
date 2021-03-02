@@ -1,5 +1,6 @@
 #include "cmake.hpp"
 #include "common.hpp"
+#include "git_connect.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -44,6 +45,8 @@ bool cmake::generate_project(const std::string &project_name, int cxx_standard,
             GITIGNORE_FLAGS::CMAKE,
             GITIGNORE_FLAGS::VS_CODE,
         });
+
+        git_connect::init_git_repo();
     }
 
     current_path("../"); // return to the original directory
