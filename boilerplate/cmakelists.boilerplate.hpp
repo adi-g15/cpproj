@@ -11,8 +11,8 @@ constexpr auto CMAKELISTS_BOILERPLATE =
                             "set(CMAKE_CXX_STANDARD ${{CPPROJ_CXX_STANDARD}})\n"
                             "set(CMAKE_CXX_STANDARD_REQUIRED TRUE)\n"
                             "\n"
-                            "target_include_directories(${{CPPROJ_PROJECT_NAME}} PRIVATE include/)\n"
-                            "\n"
                             "file(GLOB SOURCES src/*.cpp)\n"
                             "add_executable(${{CPPROJ_PROJECT_NAME}} ${SOURCES})\n"
+                            "\n"
+                            "target_include_directories(${{CPPROJ_PROJECT_NAME}} PRIVATE include/)\n"
                             "\n";
