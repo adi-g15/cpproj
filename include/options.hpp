@@ -1,7 +1,9 @@
+#pragma once
+
 #include <cxxopts.hpp>
 
 namespace option_handler {
-    void set_options(cxxopts::Options &options) {
+    inline void set_options(cxxopts::Options &options) {
         options.add_options()("name",
                             "Name of project (can be passed directly too, "
                             "without mentioning --name)",
@@ -29,11 +31,11 @@ namespace option_handler {
     }
 
     // auto show_help(auto options) { // available with Concepts
-    auto show_help(const cxxopts::Options &options) {
+    inline auto show_help(const cxxopts::Options &options) {
         std::cout << options.help() << '\n';
     }
 
-    auto debug_result(const cxxopts::ParseResult &result) {
+    inline auto debug_result(const cxxopts::ParseResult &result) {
         std::clog << "Arguments: ";
         for (const auto &arg : result.arguments()) {
             std::cout << arg.key() << " -> " << arg.value() << '\n';
@@ -45,6 +47,3 @@ namespace option_handler {
         std::cout << std::endl;
     }
 }
-
-using option_handler::set_options;
-using option_handler::show_help;

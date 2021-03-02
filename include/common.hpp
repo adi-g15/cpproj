@@ -18,15 +18,6 @@ namespace common {
     void execute_exec(std::string executable_name = "");
 
     namespace _impl {
-        /**
-         * @brief - Converts standard name in string to a number
-         *
-         * ie. for `c++17` it returns 17
-         *
-         * @exception: When the string name isn't valid, ie. starting with c++... or
-         * directly an integer eg. "17", then throws an exception
-         */
-        int standard_str_to_num(const std::string &std_name);
         std::string get_exec_name(std::ifstream &cmakelists);
     }
 }

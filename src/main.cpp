@@ -1,5 +1,4 @@
 #include <filesystem>
-#include <set>
 #include <string>
 #include <string_view>
 
@@ -7,108 +6,45 @@
 #include "make.hpp"
 #include "common.hpp"
 #include "configurations.hpp"
-#include "options.hpp"
+#include "cpproj.hpp"
 
 #include <rang.hpp>
 
 int main(int argc, const char *argv[]) {
-    std::set<std::string> used_args;
-
-    std::string PROJECT_NAME;
-    int PROJECT_CXX_STANDARD;
-    std::string PROJECT_BUILD_MNGR;
-    bool PROJECT_USE_GIT;
-
     cxxopts::Options options(
         "cpproj", "A C++ project management tool. Inspired from cargo.");
 
-    set_options(options); // set supported operations
+    cpproj::init(options);
 
     try {
-        const auto &result = options.parse(argc, argv);
-        const auto &unmatched_args = result.unmatched();
+        auto pData = cpproj::parse(options, argc, argv);
 
-        if (argc == 1 || result.count("help") > 0) {
-            show_help(options);
-
-            return 0;
-        } else if (result.count("build") > 0) {
-            return common::build_code() ? EXIT_SUCCESS : EXIT_FAILURE;
-        } else if (result.count("run") > 0) {
-            common::execute_exec(result.count("exec") > 0
-                             ? result["exec"].as<std::string>()
-                             : "");
-
-            return 0;
-        }
-
-        for (const auto &arg : result.arguments()) {
-            used_args.insert(arg.value());
-        }
-
-        if (result.count("name") > 0)
-            PROJECT_NAME = result["name"].as<std::string>();
-
-        for (const auto &arg : result.unmatched()) {
-            if (used_args.find(arg) ==
-                used_args
-                    .end()) { // first unmatched argument is considered the name
-                PROJECT_NAME = arg;
-                break;
-            }
-        }
-
-        if (PROJECT_NAME.empty() && result.count("build") == 0 &&
-            result.count("run") == 0) {
+        if (pData.ERR_BIT) {
             std::cout << rang::fg::yellow
                       << "Wrong usage... See the available options: \n\n"
                       << rang::fg::reset;
 
-            show_help(options);
+            cpproj::show_help(options);
 
             return EXIT_FAILURE;
-        }
-
-        PROJECT_CXX_STANDARD =
-            result.count("std") > 0
-                ? common::_impl::standard_str_to_num(result["std"].as<std::string>())   // i will move it later to another component likely
-                : 17;
-        PROJECT_BUILD_MNGR = result.count("build_sys") > 0
-                                 ? result["build_sys"].as<std::string>()
-                                 : "cmake";
-        PROJECT_USE_GIT =
-            result.count("no-git") > 0 ? !result["no-git"].as<bool>() : true;
-
-        switch (PROJECT_CXX_STANDARD) {
-        case 98:
-        case 11:
-        case 14:
-        case 17:
-        case 20:
-            break;
-        default:
-            std::cout << "Warning: Invalid C++ standard passed: "
-                      << PROJECT_CXX_STANDARD << "Defaulting to C++17\n";
-            PROJECT_CXX_STANDARD = 17;
-            break;
-        }
-
-        if (PROJECT_BUILD_MNGR == "cmake") {
-            cmake::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
-                                    PROJECT_USE_GIT);
-
-        } else if (PROJECT_BUILD_MNGR == "make") {
-            std::cout << "Generating a Make Project...\n";
-
-            make::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
-                                  PROJECT_USE_GIT);
-
+        } else if(pData.SHOW_HELP) {
+            cpproj::show_help(options);
+        } else if (pData.EXECUTE) {
+            common::execute_exec(pData.EXECUTABLE_NAME);
+        } else if (pData.BUILD_IT) {
+            common::build_code(pData.BUILD_TYPE);
         } else {
-            std::cout << "[Warning] " << PROJECT_BUILD_MNGR
-                      << " not supported\n";
+            if (pData.PROJECT_BUILD_MNGR == "cmake") {
+                cmake::generate_project(pData.PROJECT_NAME, pData.PROJECT_CXX_STANDARD,
+                                        pData.PROJECT_USE_GIT);
 
-            cmake::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
-                                    PROJECT_USE_GIT);
+            } else if (pData.PROJECT_BUILD_MNGR == "make") {
+                std::cout << "Generating a Make Project...\n";
+
+                make::generate_project(pData.PROJECT_NAME, pData.PROJECT_CXX_STANDARD,
+                                    pData.PROJECT_USE_GIT);
+
+            }
         }
     } catch (const std::exception &e) {
         std::cerr << e.what() << std::endl;

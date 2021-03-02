@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <filesystem>
 #include <string>
-#include <string_view>
 
 #include <rang.hpp>
 #include <util/file.hpp>
@@ -52,7 +51,7 @@ bool common::write_main(const std::string &project_name,
                         const std::string &_author) {
     std::ofstream main_cpp("src/main.cpp");
 
-    if (main_cpp)
+    if (!main_cpp)
         return false;
 
     std::string MAIN_CPP_BOILERPLATE_(MAIN_CPP_BOILERPLATE);
@@ -64,26 +63,6 @@ bool common::write_main(const std::string &project_name,
 
     main_cpp.close();
     return true;
-}
-
-/**
- * @brief - Converts standard name in string to a number
- *
- * ie. for `c++17` it returns 17
- *
- * @exception: When the string name isn't valid, ie. starting with c++... or
- * directly an integer eg. "17", then throws an exception
- */
-int common::_impl::standard_str_to_num(const std::string &std_name) {
-    std::string_view standard_str(std_name);
-    if (util::starts_with(std_name, "c++")) {
-        standard_str.remove_prefix(
-            std::size("c++")); // WILL NOT BE UNDEFINED BEHAVIOUS, since string
-                               // already atleast of 3 length
-    }
-
-    // by now, the string MUST ONLY contain an integer
-    return std::stoi(standard_str.data());
 }
 
 // returns whether the build was `attempted`
