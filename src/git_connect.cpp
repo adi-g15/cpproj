@@ -33,15 +33,14 @@ std::optional<GIT_REF> git_connect::get_current_ref() {
     // variable auto ref = std::filesystem::current_path().string();
 
     // auto [ref, was_success] = exec_command("git rev-parse HEAD");
-    auto ref = util::exec("git rev-parse HEAD");
-
     if (!exists(".git")) {
         std::cerr << "[ERROR] This directory may not a valid git repo... Or "
-                     "git rev-parse HEAD may fail to execute";
+                     "git rev-parse HEAD may fail to execute\n";
         return std::nullopt;
     }
 
     GIT_REF our_ref;
+    auto ref = util::exec("git rev-parse HEAD");
 
     if (ref.back() == '\n')
         ref.pop_back();

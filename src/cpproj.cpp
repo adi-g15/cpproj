@@ -9,11 +9,13 @@
 #include <string>
 #include <string_view>
 
-void cpproj::init(cxxopts::Options& options) {
+cxxopts::ParseResult cpproj::init(cxxopts::Options& options, int argc, const char* argv[]) {
     _impl::set_options(options); // set supported operationsons();
+
+    return options.parse(argc, argv);
 }
 
-cpproj_data cpproj::parse(cxxopts::Options& options, int argc, const char* argv[]) {
+cpproj_data cpproj::parse(cxxopts::Options& options, const cxxopts::ParseResult& result) {
     cpproj_data pData;  // project_data
     auto& PROJECT_NAME          = pData.PROJECT_NAME;
     auto& PROJECT_CXX_STANDARD  = pData.PROJECT_CXX_STANDARD;
@@ -22,10 +24,9 @@ cpproj_data cpproj::parse(cxxopts::Options& options, int argc, const char* argv[
     auto& ERR_BIT               = pData.ERR_BIT;
     auto& SHOW_HELP             = pData.SHOW_HELP;
 
-    const auto &result = options.parse(argc, argv);
     const auto &unmatched_args = result.unmatched();
 
-    if (argc == 1 || result.count("help") > 0) {
+    if (result.count("help") > 0) {
         SHOW_HELP = true;
     } else if (result.count("build") > 0) {
         pData.BUILD_IT = true;
@@ -38,8 +39,12 @@ cpproj_data cpproj::parse(cxxopts::Options& options, int argc, const char* argv[
 
     PROJECT_NAME = cpproj::_impl::get_name(result); // will be moved inside cpproj later
 
-    if (PROJECT_NAME.empty() && result.count("build") == 0 &&
-        result.count("run") == 0) {
+    if (PROJECT_NAME.empty() &&
+        result.count("help") == 0 &&
+        result.count("build") == 0 &&
+        result.count("run") == 0 &&
+        result.count("add-dep") == 0 &&
+        result.count("sync-dep") == 0) {
         ERR_BIT = true;
     }
 
@@ -74,56 +79,75 @@ cpproj_data cpproj::parse(cxxopts::Options& options, int argc, const char* argv[
         PROJECT_BUILD_MNGR = "cmake";
     }
 
-    ConfigYaml config_yaml;
-    config_yaml.PROJECT_NAME = PROJECT_NAME;
-    if(result.count("desc") > 0)
-        config_yaml.DESCRIPTION  = result["desc"].as<std::string>();
+    pData.CREATE_CONFIG = ! result["no-config"].as<bool>();
+    pData.UPDATE_CONFIG = pData.CREATE_CONFIG && result.count("add-dep") > 0;
 
-    if(result.count("add-dep") > 0) {
-        bool all_ref_known = true; // could get the latest refs of all submodules; required to show a warning at end
-        for (auto &&dep_name : result["add-dep"].as<std::vector<std::string>>() )
-        {
-            auto dep_url = dependency_mngr::get_dependency_url(dep_name);
-            if(!dep_url) {
-                std::cerr << rang::fg::yellow
-                          << "[WARNING] \"" << dep_name << "\" can't be resolved to a url\n"
-                          << rang::fg::reset;
-
-                continue;
-            }
-
-            auto dep_ref = _impl::add_dep_submodule(dep_name, dep_url.value());
-            if(!dep_ref) {
-                std::cerr << rang::fg::yellow
-                          << "[WARNING] \"" << dep_name << "\": Can't get latest ref\n"
-                          << rang::fg::reset;
-
-                all_ref_known = false;
-            }
-
-            config_yaml.dependencies.emplace_back(
-                dep_name,
-                dep_ref,
-                dep_url.value()
-            );
-        }
-
-
-        if(all_ref_known)
-            std::clog << rang::fg::yellow
-                        << "You may need to add it yourself to .cpproj.yml (if using), get the ref using `git rev-parse HEAD` inside the submodule directory\n"
-                        << rang::fg::reset;
-
+    if(result.count("desc") > 0) {
+        pData.DESCRIPTION = result["desc"].as<std::string>();
     }
 
     if(result.count("use-fetch") > 0 && result["use-fetch"].as<bool>()) {
         // @todo - Using CMake's FetchContent API
     }
 
-    if(result["no-config"].as<bool>() == false)
-        cpproj::config_writer(config_yaml);
-
     return pData;
+}
+
+void cpproj::create_config(const cpproj_data& pData, const cxxopts::ParseResult& result) {
+    std::filesystem::current_path(pData.PROJECT_NAME);
+
+    ConfigYaml config_yaml;
+
+    config_yaml.PROJECT_NAME = pData.PROJECT_NAME;
+    config_yaml.DESCRIPTION = pData.DESCRIPTION;
+    _impl::config_writer(config_yaml);
+
+    if(result.count("add-dep") > 0){
+        update_config(result);
+    }
+
+    std::filesystem::current_path("../");
+}
+
+void cpproj::update_config(const cxxopts::ParseResult& result) {
+    if(result.count("add-dep") == 0)    return;
+
+    bool all_ref_known = true; // could get the latest refs of all submodules; required to show a warning at end
+
+    std::vector<Dependency> dependencies;
+    for (auto &&dep_name : result["add-dep"].as<std::vector<std::string>>() )
+    {
+        auto dep_url = dependency_mngr::get_dependency_url(dep_name);
+        if(!dep_url) {
+            std::cerr << rang::fg::yellow
+                        << "[WARNING] \"" << dep_name << "\" can't be resolved to a url\n"
+                        << rang::fg::reset;
+
+            continue;
+        }
+
+        auto dep_ref = _impl::add_dep_submodule(dep_name, dep_url.value());
+        if(!dep_ref) {
+            std::cerr << rang::fg::yellow
+                        << "[WARNING] \"" << dep_name << "\": Can't get latest ref\n"
+                        << rang::fg::reset;
+
+            all_ref_known = false;
+        }
+
+        dependencies.emplace_back(
+            dep_name,
+            dep_ref,
+            dep_url.value()
+        );
+    }
+
+    _impl::append_dependencies(dependencies);
+
+    if(!all_ref_known)
+        std::clog << rang::fg::yellow
+                    << "You may need to add it yourself to .cpproj.yml (if using), get the ref using `git rev-parse HEAD` inside the submodule directory\n"
+                    << rang::fg::reset;
 }
 
 std::string cpproj::_impl::get_name(const cxxopts::ParseResult& result) {
@@ -172,21 +196,62 @@ int cpproj::_impl::standard_str_to_num(const std::string &std_name) {
 }
 
 optional<GIT_REF> cpproj::_impl::add_dep_submodule(const std::string& name, const std::string& url) {
-    using std::filesystem::create_directory, std::filesystem::current_path;
+    using namespace std::filesystem;
     constexpr bool use_depth_one = true;
 
     create_directory(EXTERNAL_DEPENDENCY_DIR);
 
     current_path("ext/");
 
-    std::system(( "git submodule add " + url + " " + name + (use_depth_one ? "--depth=1": "") ).data());
+    std::system(( "git submodule add " + url + " " + name + (use_depth_one ? " --depth=1": "") ).data());
+    if(!exists(name)) {
+        std::cerr << rang::fg::red
+                  << "[ERROR] Cloning submodule failed !\n"
+                  << rang::fg::reset;
+
+        throw std::runtime_error("Verify your network connection. If it's not the problem, please open an issue at https://github.com/adi-g15/cpproj/issues/");   // ie, cause the program to end
+    }
+    current_path(name);
     auto ref = git_connect::get_current_ref();
 
-    current_path("../");
+    current_path("../../");
 
     return ref;
 }
 
-void cpproj::config_writer(const ConfigYaml& config) {
-    // @todo
+void cpproj::_impl::append_dependencies(const std::vector<Dependency>& dependencies) {
+    if(dependencies.empty())    return;
+
+    std::ofstream config_file(".cpproj.yml", std::ios_base::ate);
+
+    std::string temp;
+    temp.assign(40, '\0');
+
+    for (auto &&dep : dependencies)
+    {
+        if(dep.ref.has_value()) {
+            std::copy(dep.ref.value().begin(), dep.ref.value().end(), temp.begin());
+        }
+
+        config_file << "  - " << dep.name << ":\n"
+                    << "      url: " << dep.url << '\n'
+                    << "      ref: " << (dep.ref.has_value() ? temp: "latest") << '\n';
+    }
+
+}
+
+void cpproj::_impl::config_writer(const ConfigYaml& config) {
+    std::ofstream config_file(".cpproj.yml");
+
+    config_file << "project:\n"
+                << "  name:        " << config.PROJECT_NAME << '\n'
+                << "  description: " << (config.DESCRIPTION.empty() ? "null": config.DESCRIPTION) << '\n'
+                << "  repo_url:    " << "null" << '\n'
+                << "  license:     " << "Unlicense" << '\n'
+                << "\n"
+                << "dependencies:\n";
+
+    config_file.close();
+
+    _impl::append_dependencies(config.dependencies);
 }
