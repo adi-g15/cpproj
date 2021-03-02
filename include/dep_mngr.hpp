@@ -47,4 +47,8 @@ namespace dependency_mngr {
             return dependency_database[name];
         } else return std::nullopt;
     }
+
+    inline void print_all() {
+        // @todo
+    }
 }

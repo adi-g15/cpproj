@@ -19,7 +19,7 @@ int main(int argc, const char *argv[]) {
     try {
         auto pData = cpproj::parse(options, result);
 
-        if (pData.ERR_BIT) {
+        if (pData.ERR_BIT && argc > 1) {
             std::cout << rang::fg::yellow
                       << "Wrong usage... See the available options: \n\n"
                       << rang::fg::reset;

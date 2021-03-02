@@ -45,7 +45,9 @@ A C++ project management tool. Inspired from cargo.
 Usage:
   cpproj [OPTION...]
 
-      --name arg       Name of project (mentioning --name can be skipped)
+      --name arg       Name of project (can be passed directly too, without 
+                       mentioning --name)
+      --desc arg       Brief description
       --std arg        C++ standard to use (11,14,17,20,..., default is 
                        c++17)
       --no-git         DON'T initialise a repo, default is a git repo is 
@@ -53,10 +55,17 @@ Usage:
       --build_sys arg  make or cmake, build system or generator, default is 
                        cmake (default: cmake)
   -B, --build          Build the project
+      --release        flag for a Release build
   -R, --run            Build and Run the executable
       --exec arg       Executable name (this is not required, and is used 
                        only by `cpproj run`)
   -h, --help           Show help
+  -D, --add-dep arg    Add a dependency to ext/ directory
+      --sync-dep       Sync all dependency submodules, according to 
+                       .cpproj.yml
+      --use-fetch      use CMake's FetchContent API (adds to 
+                       CMakeLists.txt)
+      --no-config      don't create the .cpproj.yml config file
 ```
 
 **Examples**
@@ -67,13 +76,31 @@ Usage:
 * `cpproj my_project --std 14`    (builds a CMake project)
 * `cpproj --build`                (inside a project or it's build directory)
 * `cpproj --run`                  (also builds the project)
+* `cpproj --add-dep=utilpp,graphMat`                  (add dependencies to the project)
+
+> Basic Dependency Handling
+  Use the --add-dep to pass the dependencies as array or several --add-dep flags
+
+  Say you want to use the awesome graphMat and utilpp libraries, you don't have to know the repo link, etc. to submodule it
+
+```sh
+  # Example Workflow
+  cpproj asor
+
+  # DONE, you have a complete project, which also has a github action, to check build status at each push :tada:
+
+  # Edit files
+  cpproj -R   # build and execute it
+
+  cpproj --add-dep=utilpp,graphMat
+```
 
 > Irrespective of order of arguments, and all above can be combined in any order
 
-## Future
+## Todo
 
-* See the .cpproj.yml at the root of this repo, supporting the features list in it will help
-* Atleast some dependency handling (not management, the project's not targetting for that now, simple, you pass an argument, if Find* can find it add it then to CMakeLists)
+* Adding the cloned dependencies in CMakeLists(includes or sub_directory)
+* List all available dependencies with brief description
 * msbuild starter boilerplate
 
 :copyright: Aditya Gupta 2021
