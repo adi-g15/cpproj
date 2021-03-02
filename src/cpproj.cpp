@@ -1,5 +1,8 @@
 #include "cpproj.hpp"
+#include "dep_mngr.hpp"
+#include "common.hpp"
 
+#include <rang.hpp>
 #include <util/string.hpp>
 
 #include <set>
@@ -71,12 +74,63 @@ cpproj_data cpproj::parse(cxxopts::Options& options, int argc, const char* argv[
         PROJECT_BUILD_MNGR = "cmake";
     }
 
+    ConfigYaml config_yaml;
+    config_yaml.PROJECT_NAME = PROJECT_NAME;
+    if(result.count("desc") > 0)
+        config_yaml.DESCRIPTION  = result["desc"].as<std::string>();
+
+    if(result.count("add-dep") > 0) {
+        bool all_ref_known = true; // could get the latest refs of all submodules; required to show a warning at end
+        for (auto &&dep_name : result["add-dep"].as<std::vector<std::string>>() )
+        {
+            auto dep_url = dependency_mngr::get_dependency_url(dep_name);
+            if(!dep_url) {
+                std::cerr << rang::fg::yellow
+                          << "[WARNING] \"" << dep_name << "\" can't be resolved to a url\n"
+                          << rang::fg::reset;
+
+                continue;
+            }
+
+            auto dep_ref = _impl::add_dep_submodule(dep_name, dep_url.value());
+            if(!dep_ref) {
+                std::cerr << rang::fg::yellow
+                          << "[WARNING] \"" << dep_name << "\": Can't get latest ref\n"
+                          << rang::fg::reset;
+
+                all_ref_known = false;
+            }
+
+            config_yaml.dependencies.emplace_back(
+                dep_name,
+                dep_ref,
+                dep_url.value()
+            );
+        }
+
+
+        if(all_ref_known)
+            std::clog << rang::fg::yellow
+                        << "You may need to add it yourself to .cpproj.yml (if using), get the ref using `git rev-parse HEAD` inside the submodule directory\n"
+                        << rang::fg::reset;
+
+    }
+
+    if(result.count("use-fetch") > 0 && result["use-fetch"].as<bool>()) {
+        // @todo - Using CMake's FetchContent API
+    }
+
+    if(result["no-config"].as<bool>() == false)
+        cpproj::config_writer(config_yaml);
+
     return pData;
 }
 
 std::string cpproj::_impl::get_name(const cxxopts::ParseResult& result) {
+    using string_ref = std::string_view; /*std::reference_wrapper<std::string>>*/;
+
     std::string project_name;
-    std::set<std::string> used_args;
+    std::set<string_ref> used_args;
 
     for (const auto &arg : result.arguments()) {
         used_args.insert(arg.value());
@@ -115,4 +169,24 @@ int cpproj::_impl::standard_str_to_num(const std::string &std_name) {
 
     // by now, the string MUST ONLY contain an integer
     return std::stoi(standard_str.data());
+}
+
+optional<GIT_REF> cpproj::_impl::add_dep_submodule(const std::string& name, const std::string& url) {
+    using std::filesystem::create_directory, std::filesystem::current_path;
+    constexpr bool use_depth_one = true;
+
+    create_directory(EXTERNAL_DEPENDENCY_DIR);
+
+    current_path("ext/");
+
+    std::system(( "git submodule add " + url + " " + name + (use_depth_one ? "--depth=1": "") ).data());
+    auto ref = git_connect::get_current_ref();
+
+    current_path("../");
+
+    return ref;
+}
+
+void cpproj::config_writer(const ConfigYaml& config) {
+    // @todo
 }

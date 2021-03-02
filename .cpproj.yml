@@ -6,15 +6,14 @@ project:
   description: A C++ project management tools
   repo_url: https://github.com/adi-g15/cpproj.git
   license: Unlicense
-  
-dependencies:
-  utilpp:
-    url: https://github.com/adi-g15/utilpp.git
-    ref: a6f49b28f50d4d2f614291e210fc157c58e1192b
-  rang:
-    url: https://github.com/adi-g15/rang.git
-    ref: 16d6b0dde1bce741d072150115dfe0bbd6dab0fa
-  cxxopts:
-    utl: https://github.com/jarro2783/cxxopts.git
-    ref: dd45a0801c99d62109aaa29f8c410ba8def2fbf2
 
+dependencies:
+  - utilpp:
+      url: https://github.com/adi-g15/utilpp.git
+      ref: a6f49b28f50d4d2f614291e210fc157c58e1192b
+  - rang:
+      url: https://github.com/adi-g15/rang.git
+      ref: 16d6b0dde1bce741d072150115dfe0bbd6dab0fa
+  - cxxopts:
+      utl: https://github.com/jarro2783/cxxopts.git
+      ref: dd45a0801c99d62109aaa29f8c410ba8def2fbf2
