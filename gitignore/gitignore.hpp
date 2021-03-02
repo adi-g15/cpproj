@@ -16,7 +16,7 @@ enum class GITIGNORE_FLAGS {
 
 namespace gitignore
 {
-    void create_gitignore(const std::vector<GITIGNORE_FLAGS>& flags) {
+    inline void create_gitignore(const std::vector<GITIGNORE_FLAGS>& flags) {
         std::ofstream file(".gitignore");
 
         for (auto &&flag : flags)

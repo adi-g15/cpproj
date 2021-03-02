@@ -4,8 +4,9 @@
 #include <string_view>
 
 #include "cmake.hpp"
-#include "configurations.hpp"
 #include "make.hpp"
+#include "common.hpp"
+#include "configurations.hpp"
 #include "options.hpp"
 
 #include <rang.hpp>
@@ -32,9 +33,9 @@ int main(int argc, const char *argv[]) {
 
             return 0;
         } else if (result.count("build") > 0) {
-            return build_code() ? EXIT_SUCCESS : EXIT_FAILURE;
+            return common::build_code() ? EXIT_SUCCESS : EXIT_FAILURE;
         } else if (result.count("run") > 0) {
-            execute_exec(result.count("exec") > 0
+            common::execute_exec(result.count("exec") > 0
                              ? result["exec"].as<std::string>()
                              : "");
 
@@ -70,7 +71,7 @@ int main(int argc, const char *argv[]) {
 
         PROJECT_CXX_STANDARD =
             result.count("std") > 0
-                ? standard_str_to_num(result["std"].as<std::string>())
+                ? common::_impl::standard_str_to_num(result["std"].as<std::string>())   // i will move it later to another component likely
                 : 17;
         PROJECT_BUILD_MNGR = result.count("build_sys") > 0
                                  ? result["build_sys"].as<std::string>()
@@ -99,7 +100,7 @@ int main(int argc, const char *argv[]) {
         } else if (PROJECT_BUILD_MNGR == "make") {
             std::cout << "Generating a Make Project...\n";
 
-            generate_make_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
+            make::generate_project(PROJECT_NAME, PROJECT_CXX_STANDARD,
                                   PROJECT_USE_GIT);
 
         } else {

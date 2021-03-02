@@ -10,6 +10,8 @@
 #include <util/string.hpp>
 
 #include "boilerplate/main.boilerplate.hpp"
+
+#include "cmake.hpp"
 #include "make.hpp"
 
 namespace fs = std::filesystem;
@@ -17,8 +19,8 @@ namespace fs = std::filesystem;
 // returns FALSE if USER DENIED ANY FURTHER ACTION
 bool common::check_project_existence(const std::string &project_name) {
     char ch;
-    std::clog << "Working Directory: " << current_path() << '\n';
-    if (exists(project_name)) {
+    std::clog << "Working Directory: " << fs::current_path() << '\n';
+    if (fs::exists(project_name)) {
         std::cout << "\n\n"
                   << project_name << "/ already exists! Chose one option: \n"
                   << "[Y|y] Delete original folder\n"
@@ -31,7 +33,7 @@ bool common::check_project_existence(const std::string &project_name) {
         case 'Y':
         case 'y':
             std::clog << "Removed " << project_name << "/\n";
-            remove_all(project_name);
+            fs::remove_all(project_name);
         case 'O':
         case 'o':
             break; // continue with the function
@@ -72,7 +74,7 @@ bool common::write_main(const std::string &project_name,
  * @exception: When the string name isn't valid, ie. starting with c++... or
  * directly an integer eg. "17", then throws an exception
  */
-int standard_str_to_num(const std::string &std_name) {
+int common::_impl::standard_str_to_num(const std::string &std_name) {
     std::string_view standard_str(std_name);
     if (util::starts_with(std_name, "c++")) {
         standard_str.remove_prefix(
@@ -84,34 +86,16 @@ int standard_str_to_num(const std::string &std_name) {
     return std::stoi(standard_str.data());
 }
 
-inline bool build_cmake_proj() {
-    bool in_project_root = exists("CMakeLists.txt");
-    if (in_project_root) {
-        create_directory("build");
-
-        std::filesystem::current_path("build"); // cd to build
-    }
-
-    if (exists("../CMakeLists.txt")) {
-        std::system("cmake .. && cmake --build .");
-
-        if (in_project_root)
-            current_path(".."); // go back to project root
-        return true;
-    } else
-        return false;
-}
-
 // returns whether the build was `attempted`
-bool build_code() {
+bool common::build_code(BuildType build_type) {
     bool is_cmake_proj;
 
     is_cmake_proj = fs::exists("CMakeLists.txt");
 
     if (is_cmake_proj)
-        return build_cmake_proj();
+        return cmake::build_project(build_type);
     else if (fs::exists("Makefile"))
-        return build_make_proj();
+        return make::build_project(build_type);
     else {
         std::cerr << "[Error] Not in a project, or build system/generator not "
                      "supported\n";
@@ -120,7 +104,7 @@ bool build_code() {
     }
 }
 
-std::string get_exec_name(std::ifstream &cmakelists) {
+std::string common::_impl::get_exec_name(std::ifstream &cmakelists) {
     if (!cmakelists)
         return "";
 
@@ -139,7 +123,7 @@ std::string get_exec_name(std::ifstream &cmakelists) {
                        }));
 }
 
-void execute_exec(std::string executable_name) {
+void common::execute_exec(std::string executable_name) {
     if (!build_code())
         return;
 
@@ -161,7 +145,7 @@ void execute_exec(std::string executable_name) {
     if (cmakelists &&
         executable_name
             .empty()) { // when exec name is passed, it takes priority
-        executable_name = get_exec_name(cmakelists);
+        executable_name = _impl::get_exec_name(cmakelists);
     }
 
     if (!executable_name.empty()) {

@@ -24,7 +24,7 @@ bool cmake::generate_project(const std::string &project_name, int cxx_standard,
 
     std::cout << "Generating a CMake Project...\n";
 
-    common::check_project_existence(project_name);
+    if( common::check_project_existence(project_name) == false ) return false;
 
     create_directory(project_name);
     current_path(project_name); // for the rest of project we will cd into the
@@ -57,12 +57,16 @@ bool cmake::generate_project(const std::string &project_name, int cxx_standard,
 bool cmake::write_cmakelists(const std::string &project_name,
                              int cxx_standard) {
     std::ofstream CMakeLists("CMakeLists.txt");
+
+    if(!CMakeLists)  return false;
     std::string CMAKELISTS_BOILERPLATE_(CMAKELISTS_BOILERPLATE);
     util::replace_all(CMAKELISTS_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
     util::replace_all(CMAKELISTS_BOILERPLATE_, TAG_CXX_STANDARD,
                       std::to_string(cxx_standard));
     CMakeLists << CMAKELISTS_BOILERPLATE_;
     CMakeLists.close();
+
+    return true;
 }
 
 // should be called from PROJECT_ROOT_DIRECTORY
@@ -71,6 +75,7 @@ bool cmake::write_workflow(const std::string &project_name) {
     std::string CMAKE_WORKFLOW_BOILERPLATE_(CMAKE_WORKFLOW_BOILERPLATE);
 
     std::ofstream CMakeWorkflow(".github/workflows/build.yml");
+    if(!CMakeWorkflow)  return false;
 
     util::replace_all(CMAKE_WORKFLOW_BOILERPLATE_, TAG_PROJECT_NAME,
                       project_name);
@@ -78,6 +83,8 @@ bool cmake::write_workflow(const std::string &project_name) {
     CMakeWorkflow << CMAKE_WORKFLOW_BOILERPLATE_;
 
     CMakeWorkflow.close();
+
+    return true;
 }
 
 bool cmake::write_readme(const std::string &project_name, int cxx_standard) {
@@ -95,4 +102,34 @@ bool cmake::write_readme(const std::string &project_name, int cxx_standard) {
     readme.close();
 
     return true;
+}
+
+bool cmake::build_project(BuildType build_type) {
+    using namespace std::filesystem;
+
+    bool in_project_root = exists("CMakeLists.txt");
+    if (in_project_root) {
+        create_directory("build");
+
+        std::filesystem::current_path("build"); // cd to build
+    }
+
+    if (exists("../CMakeLists.txt")) {
+        switch (build_type)
+        {
+        case BuildType::Debug :
+            std::system("cmake .. && cmake --build .");
+            break;
+        case BuildType::Release :
+            std::system("cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . -- config Release");
+            break;
+        default:
+            break;
+        }
+
+        if (in_project_root)
+            current_path(".."); // go back to project root
+        return true;
+    } else
+        return false;
 }

@@ -1,9 +1,7 @@
 #pragma once
 
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
 #include <string>
+#include "enums.hpp"
 
 // @note - Every function returning bool returns FALSE when FAILS
 namespace cmake {
@@ -14,4 +12,6 @@ namespace cmake {
     bool write_cmakelists(const std::string &project_name, int cxx_standard);
     bool write_readme(const std::string& project_name, int cxx_standard);
     bool write_workflow(const std::string& project_name);
+
+    bool build_project(BuildType = BuildType::Debug);
 }
