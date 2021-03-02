@@ -15,7 +15,7 @@
 #include "gitignore/gitignore.hpp"
 
 bool make::generate_project(const std::string &project_name, int cxx_standard,
-                        bool use_git) {
+                        const std::string &project_desc, bool use_git) {
     using namespace std::filesystem;
 
     bool all_successful = true;
@@ -31,10 +31,10 @@ bool make::generate_project(const std::string &project_name, int cxx_standard,
     create_directory("src");
     create_directory("include");
 
-    all_successful = common::write_main(project_name) && true;
+    all_successful = common::write_main(project_name, project_desc) && true;
     all_successful =
         make::write_makefile(project_name, cxx_standard) && true;
-    all_successful = make::write_readme(project_name, cxx_standard) && true;
+    all_successful = make::write_readme(project_name, cxx_standard, project_desc) && true;
 
     if (use_git) {
         all_successful = make::write_workflow(project_name) && true;
@@ -78,13 +78,14 @@ bool make::write_workflow(const std::string& project_name) {
     return true;
 }
 
-bool make::write_readme(const std::string& project_name, int cxx_standard) {
+bool make::write_readme(const std::string& project_name, int cxx_standard, const std::string &project_desc) {
     std::ofstream readme("README.md");
 
     if(!readme) return false;
     std::string README_BOILERPLATE_ = README_CMAKE_BOILERPLATE;
 
     util::replace_all(README_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
+    util::replace_all(README_BOILERPLATE_, TAG_PROJECT_DESC, project_desc);
     util::replace_all(README_BOILERPLATE_, TAG_CXX_STANDARD,
                     std::to_string(cxx_standard));
 

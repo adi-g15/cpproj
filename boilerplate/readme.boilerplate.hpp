@@ -1,10 +1,12 @@
 #pragma once
 
+constexpr auto DEFAULT_DESC = "Have fun coding, put in your project's description here.";
+
 constexpr auto README_CMAKE_BOILERPLATE = 
                         "${{CPPROJ_PROJECT_NAME}}\n"
                         "----\n"
                         "\n"
-                        "Have fun coding, put in your project's description here.\n"
+                        "${{CPPROJ_PROJECT_DESC}}\n"
                         "\n"
                         "## Dependencies\n"
                         "\n"

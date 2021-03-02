@@ -3,6 +3,7 @@
 constexpr auto MAIN_CPP_BOILERPLATE = 
                     "/*\n"
                     "    ${{CPPROJ_PROJECT_NAME}}\n"
+                    "    ${{CPPROJ_PROJECT_DESC}}\n"
                     "*/\n"
                     "\n"
                     "#include <iostream>\n"

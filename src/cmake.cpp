@@ -19,7 +19,7 @@
 using namespace std::filesystem;
 
 bool cmake::generate_project(const std::string &project_name, int cxx_standard,
-                             bool use_git) {
+                             const std::string& project_desc, bool use_git) {
     bool all_successful = true;
 
     std::cout << "Generating a CMake Project...\n";
@@ -36,7 +36,7 @@ bool cmake::generate_project(const std::string &project_name, int cxx_standard,
     all_successful = common::write_main(project_name) && true;
     all_successful =
         cmake::write_cmakelists(project_name, cxx_standard) && true;
-    all_successful = cmake::write_readme(project_name, cxx_standard) && true;
+    all_successful = cmake::write_readme(project_name, cxx_standard, project_desc) && true;
 
     if (use_git) {
         all_successful = cmake::write_workflow(project_name) && true;
@@ -87,7 +87,7 @@ bool cmake::write_workflow(const std::string &project_name) {
     return true;
 }
 
-bool cmake::write_readme(const std::string &project_name, int cxx_standard) {
+bool cmake::write_readme(const std::string &project_name, int cxx_standard, const std::string &project_desc) {
     std::ofstream readme("README.md");
 
     if (!readme)
@@ -95,6 +95,7 @@ bool cmake::write_readme(const std::string &project_name, int cxx_standard) {
 
     std::string README_BOILERPLATE_ = README_CMAKE_BOILERPLATE;
     util::replace_all(README_BOILERPLATE_, TAG_PROJECT_NAME, project_name);
+    util::replace_all(README_BOILERPLATE_, TAG_PROJECT_DESC, project_desc);
     util::replace_all(README_BOILERPLATE_, TAG_CXX_STANDARD,
                       std::to_string(cxx_standard));
 

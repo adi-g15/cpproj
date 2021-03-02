@@ -38,13 +38,13 @@ int main(int argc, const char *argv[]) {
         } else{    // create a new project
             if (pData.PROJECT_BUILD_MNGR == "cmake") {
                 cmake::generate_project(pData.PROJECT_NAME, pData.PROJECT_CXX_STANDARD,
-                                        pData.PROJECT_USE_GIT);
+                                        pData.DESCRIPTION, pData.PROJECT_USE_GIT);
 
             } else if (pData.PROJECT_BUILD_MNGR == "make") {
                 std::cout << "Generating a Make Project...\n";
 
                 make::generate_project(pData.PROJECT_NAME, pData.PROJECT_CXX_STANDARD,
-                                    pData.PROJECT_USE_GIT);
+                                    pData.DESCRIPTION, pData.PROJECT_USE_GIT);
             }
 
             if(pData.CREATE_CONFIG)    cpproj::create_config(pData, result);
