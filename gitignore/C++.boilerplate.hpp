@@ -1,6 +1,8 @@
 #pragma once
 
 constexpr auto CPP_GITIGNORE = 
+                        "build\n"
+                        "\n"
                         "# Prerequisites\n"
                         "*.d\n"
                         "\n"
