@@ -140,6 +140,7 @@ void common::execute_exec(std::string executable_name) {
             executable_path = "Release/" + executable_path + ".exe";
         }
 
+        std::cout << "\nOUTPUT\n========\n";
         std::system(executable_path.data());
     }
 

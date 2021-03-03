@@ -1,8 +1,8 @@
-# This file structure is to be supported, not all keys need to be considered at first, keep it simple, the dependencies section just puts submodules in an ext/ directory, it is still very helpful, since it should allow this: you just add the dependency name, and whenever sync or build is executed, add  the url and ref section of the section by itself, this will likely work with help of a config file containing a mapping to these functions
+# This is a sample cpproj configuration file, YOU DON'T NEED TO HAVE THIS FILE for cpproj to work
 
 project:
   name: CPProj
-  author: Aditya Gupta <ag15035@gmail.com>
+  author: Aditya Gupta <adityag.ug19.cs@nitp.ac.in>
   description: A C++ project management tools
   repo_url: https://github.com/adi-g15/cpproj.git
   license: Unlicense

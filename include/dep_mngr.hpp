@@ -29,7 +29,6 @@ namespace dependency_mngr {
         }
 
         for(auto iter = yaml_tree.Begin(); iter != yaml_tree.End(); iter++) {
-            std::cout << (*iter).first << '\n';
             dependency_database.insert({
                 (*iter).first,
                 (*iter).second.As<std::string>()
