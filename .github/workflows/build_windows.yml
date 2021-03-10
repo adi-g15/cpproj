@@ -1,10 +1,9 @@
-name: Windows Build
+name: Build Status
 
 on: [push, pull_request]
 
 env:
   BUILD_TYPE: Release
-  SAMPLE_PROJ: new_proj
 
 # Ubuntu latest build fail, since it can't find <filesystem>, even though C++17 standard
 jobs:
@@ -26,11 +25,3 @@ jobs:
     - name: Build
       working-directory: ${{github.workspace}}/build
       run: cmake --build . --config $BUILD_TYPE
-
-    - name: Create sample repo
-      working-directory: ${{github.workspace}}/build/${{BUILD_TYPE}}
-      run: .\cpproj ${{SAMPLE_PROJ}}
-
-    - name: Build and run sample repo
-      working-directory: ${{github.workspace}}/build/${{BUILD_TYPE}}/${{SAMPLE_PROJ}}
-      run: ..\cpproj --run && cd build && ..\cpproj --run
