@@ -1,7 +1,6 @@
 CPProj
 ----
 
-[![Build Status](https://github.com/adi-g15/cpproj/actions/workflows/build_ubuntu.yml/badge.svg)](https://github.com/adi-g15/cpproj/actions/workflows/build_ubuntu.yml)
 [![Build Status](https://github.com/adi-g15/cpproj/actions/workflows/build_windows.yml/badge.svg)](https://github.com/adi-g15/cpproj/actions/workflows/build_windows.yml)
 
 A C++ project management tool. Inspired from cargo.
@@ -10,6 +9,9 @@ For now, i am just trying to replicating the functionalities,
 so I can get started with new projects fairly quickly, ie. 
 it won't do anything much smart, mostly just creating a boilerplate.
 And is intended to be usable offline, as most are, instead of cloning an online repo.
+
+> *Note*: There's another tool named [build2](https://www.build2.org). I got to know it recently (after this project completed its basic form).
+>  You may still chose to use cpproj, for its simplicity, and being much smaller and much faster to build
 
 ## Dependencies
 
