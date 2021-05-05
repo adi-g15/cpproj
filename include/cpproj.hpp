@@ -13,6 +13,10 @@
 
 using std::optional;
 
+struct action {
+
+};
+
 struct cpproj_data {
     std::string PROJECT_NAME;
     std::string DESCRIPTION;

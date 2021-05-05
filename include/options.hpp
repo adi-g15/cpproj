@@ -30,14 +30,16 @@ inline void set_options(cxxopts::Options &options) {
                           cxxopts::value<std::string>());
     options.add_options()("h,help", "Show help");
     options.add_options()("D,add-dep", "Add a dependency to ext/ directory",
-                          cxxopts::value<std::vector<std::string>>())(
-        "sync-dep", "Sync all dependency submodules, according to .cpproj.yml")(
-        "use-fetch",
+                          cxxopts::value<std::vector<std::string>>())
+                        ("sync-dep", "Sync all dependency submodules, according to .cpproj.yml")
+        ("use-fetch",
         "use CMake's FetchContent API (adds to CMakeLists.txt)"); // not
                                                                   // currently
                                                                   // supported
     options.add_options()("no-config",
                           "don't create the .cpproj.yml config file");
+    options.add_options()("add-license",
+                          "Creates a LICENSE file in your project root");
 }
 
 // auto show_help(auto options) { // available with Concepts
