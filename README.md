@@ -16,6 +16,9 @@ And is intended to be usable offline, as most are, instead of cloning an online 
 To make my work faster, i used:
 
 * [cxxopts](https://github.com/jarro2783/cxxopts) - Lightweight C++ command line option parser
+* [mini-yaml](https://github.com/jimmiebergmann/mini-yaml) - Library to work with YAML files (used for config files)
+* [rang](https://github.com/jimmiebergmann/mini-yaml) - Small header only library for color output on terminals
+* [utilpp](https://github.com/adi-g15/utilpp) - Small header-only library for common utility functions/classes
 
 ## Building
 
