@@ -9,6 +9,7 @@ constexpr auto MAIN_CPP_BOILERPLATE =
                     "#include <iostream>\n"
                     "\n"
                     "int main() {\n"
-                    "    std::cout << \"Namaste!\";\n"
+                    "    std::cout << \"Namaste!\\n\";\n"
                     "}\n"
                     "\n";
+

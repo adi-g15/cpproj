@@ -108,29 +108,33 @@ bool cmake::write_readme(const std::string &project_name, int cxx_standard, cons
 bool cmake::build_project(BuildType build_type) {
     using namespace std::filesystem;
 
-    bool in_project_root = exists("CMakeLists.txt");
-    if (in_project_root) {
+    bool was_in_project_root = exists("CMakeLists.txt");
+    if (was_in_project_root) {
         create_directory("build");
 
         std::filesystem::current_path("build"); // cd to build
     }
 
+    bool was_build_success = false;
+
     if (exists("../CMakeLists.txt")) {
         switch (build_type)
         {
         case BuildType::Debug :
-            std::system("cmake .. && cmake --build .");
+            was_build_success = std::system("cmake .. && cmake --build .");
             break;
         case BuildType::Release :
-            std::system("cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . -- config Release");
+            was_build_success = std::system("cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . -- config Release");
             break;
         default:
             break;
         }
 
-        if (in_project_root)
+        if (was_in_project_root) {	// ie. 'initially' we were at project root, 'now' in build directory
             current_path(".."); // go back to project root
-        return true;
+	}
+
+	return was_build_success;
     } else
         return false;
 }
